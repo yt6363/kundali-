@@ -2,6 +2,7 @@ import ephem
 import datetime
 import streamlit as st
 import matplotlib.pyplot as plt
+import numpy as np
 
 def calculate_planetary_positions(date_time, latitude, longitude):
     observer = ephem.Observer()
@@ -22,38 +23,38 @@ def calculate_planetary_positions(date_time, latitude, longitude):
 
 def plot_kundali(positions):
     fig, ax = plt.subplots(figsize=(8, 8))
-    ax.set_xlim(0, 8)
-    ax.set_ylim(0, 8)
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
     ax.axis('off')
 
-    # Coordinates for the diamond-shaped chart
-    squares = [
-        (4, 6), (6, 5), (7, 4), (6, 3), (4, 2), (2, 3), (1, 4), (2, 5),
-        (3, 5.5), (5, 5.5), (5, 2.5), (3, 2.5)
+    # Draw the diamonds
+    diamonds = [
+        [(5, 9), (7, 7), (5, 5), (3, 7)],  # 1
+        [(7, 7), (9, 5), (7, 3), (5, 5)],  # 2
+        [(5, 5), (7, 3), (5, 1), (3, 3)],  # 3
+        [(3, 7), (5, 5), (3, 3), (1, 5)],  # 4
+        [(1, 5), (3, 3), (1, 1), (-1, 3)], # 5
+        [(3, 3), (5, 1), (3, -1), (1, 1)], # 6
+        [(5, 1), (7, -1), (5, -3), (3, -1)], # 7
+        [(7, -1), (9, -3), (7, -5), (5, -3)], # 8
+        [(5, -3), (7, -5), (5, -7), (3, -5)], # 9
+        [(3, -1), (5, -3), (3, -5), (1, -3)], # 10
+        [(1, 1), (3, -1), (1, -3), (-1, -1)], # 11
+        [(3, 7), (1, 5), (3, 3), (5, 5)]  # 12
     ]
 
-    # Drawing lines for the diamond shape
-    lines = [
-        [(4, 6), (6, 5), (7, 4), (6, 3), (4, 2), (2, 3), (1, 4), (2, 5), (4, 6)],
-        [(4, 6), (4, 2)],
-        [(6, 5), (2, 3)],
-        [(7, 4), (1, 4)],
-        [(6, 3), (2, 5)],
-    ]
-
-    for line in lines:
-        xs, ys = zip(*line)
-        ax.plot(xs, ys, 'k')
-
-    # Numbering the houses
-    for i, (x, y) in enumerate(squares):
-        ax.text(x, y, f'{i+1}', fontsize=12, ha='center', va='center')
+    for i, diamond in enumerate(diamonds):
+        poly = plt.Polygon(diamond, fill=None, edgecolor='k')
+        ax.add_patch(poly)
+        cx = np.mean([point[0] for point in diamond])
+        cy = np.mean([point[1] for point in diamond])
+        ax.text(cx, cy, f'{i+1}', fontsize=12, ha='center', va='center')
 
     # Plot planetary positions
     for planet, pos in positions.items():
         degree = pos['degree']
         sign = pos['sign']
-        x, y = squares[sign - 1]
+        x, y = diamonds[sign - 1][0]
         ax.text(x, y, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
 
     return fig
@@ -98,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
