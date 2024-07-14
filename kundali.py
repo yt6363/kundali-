@@ -28,31 +28,18 @@ def plot_kundali(positions):
 
     # Draw the diamond chart
     squares = [
-        (2, 6, 4, 4),
-        (4, 8, 4, 4),
-        (2, 4, 4, 4),
-        (0, 4, 4, 4),
-        (2, 2, 4, 4),
-        (4, 0, 4, 4),
-        (6, 2, 4, 4),
-        (6, 4, 4, 4),
-        (4, 6, 4, 4),
-        (4, 4, 2, 2)
+        (4, 6), (6, 4), (4, 2), (2, 4), (0, 4), (2, 6), (6, 6), (6, 2), (2, 2), (4, 4), (0, 6), (0, 2)
     ]
-
-    for i, (x, y, width, height) in enumerate(squares):
-        ax.plot([x, x+width], [y, y], 'k')
-        ax.plot([x, x], [y, y+height], 'k')
-        ax.plot([x, x+width], [y+height, y+height], 'k')
-        ax.plot([x+width, x+width], [y, y+height], 'k')
-        ax.text(x+width/2, y+height/2, f'{i+1}', fontsize=12, ha='center', va='center')
+    for i, (x, y) in enumerate(squares):
+        ax.plot([4, x], [4, y], 'k')
+        ax.text(x, y, f'{i+1}', fontsize=12, ha='center', va='center')
 
     # Plot planetary positions
     for planet, pos in positions.items():
         degree = pos['degree']
         sign = pos['sign']
-        x, y, width, height = squares[sign-1]
-        ax.text(x + width / 2, y + height / 2, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
+        x, y = squares[sign - 1]
+        ax.text(x, y, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
 
     return fig
 
