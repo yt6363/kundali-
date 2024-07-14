@@ -54,8 +54,8 @@ def plot_kundali(positions):
     for planet, pos in positions.items():
         degree = pos['degree']
         sign = pos['sign']
-        x, y = diamonds[sign - 1][0]
-        ax.text(x, y, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
+        cx, cy = np.mean([point[0] for point in diamonds[sign - 1]]), np.mean([point[1] for point in diamonds[sign - 1]])
+        ax.text(cx, cy, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
 
     return fig
 
@@ -99,4 +99,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
