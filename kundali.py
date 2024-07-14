@@ -1,8 +1,7 @@
 import ephem
 import datetime
 import streamlit as st
-import matplotlib.pyplot as plt
-import numpy as np
+import pandas as pd
 
 def calculate_planetary_positions(date_time, latitude, longitude):
     observer = ephem.Observer()
@@ -20,51 +19,6 @@ def calculate_planetary_positions(date_time, latitude, longitude):
         positions[planet.name] = {'degree': lon % 30, 'sign': sign}
     
     return positions
-
-def plot_kundali(positions):
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.set_xlim(0, 12)
-    ax.set_ylim(0, 12)
-    ax.axis('off')
-
-    # Draw the diamonds
-    diamonds = [
-        [(6, 10), (10, 6), (6, 2), (2, 6)],  # 1
-        [(6, 10), (10, 6), (6, 6), (2, 6)],  # 2
-        [(6, 6), (10, 6), (6, 2), (6, 2)],  # 3
-        [(2, 10), (6, 6), (2, 2), (2, 6)],  # 4
-        [(6, 10), (6, 6), (2, 2), (2, 6)],  # 5
-        [(2, 6), (6, 2), (2, 2), (2, 2)],  # 6
-        [(10, 10), (10, 6), (6, 6), (6, 6)],  # 7
-        [(6, 10), (10, 10), (6, 6), (6, 6)],  # 8
-        [(10, 6), (6, 6), (6, 2), (10, 2)],  # 9
-        [(2, 10), (6, 10), (2, 6), (2, 6)],  # 10
-        [(6, 10), (2, 10), (2, 6), (2, 6)],  # 11
-        [(10, 10), (10, 6), (6, 6), (6, 6)],  # 12
-    ]
-
-    for square in diamonds:
-        square.append(square[0])  # Close the square
-        xs, ys = zip(*square)
-        ax.plot(xs, ys, 'k')
-
-    # Number the houses
-    house_positions = [
-        (6, 8), (8, 6), (6, 4), (4, 6), (5, 9), (8, 10), (7, 2), (2, 3),
-        (3, 7), (2, 5), (6, 5), (8, 8)
-    ]
-
-    for i, (cx, cy) in enumerate(house_positions):
-        ax.text(cx, cy, f'{i+1}', fontsize=12, ha='center', va='center')
-
-    # Plot planetary positions
-    for planet, pos in positions.items():
-        degree = pos['degree']
-        sign = pos['sign']
-        cx, cy = house_positions[sign - 1]
-        ax.text(cx, cy, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
-
-    return fig
 
 def get_lat_long(country):
     coordinates = {
@@ -100,9 +54,15 @@ def main():
     date_time = datetime.datetime(year, month, day, hour, minute)
 
     positions = calculate_planetary_positions(date_time, latitude, longitude)
-    fig = plot_kundali(positions)
+    
+    data = []
+    for planet, pos in positions.items():
+        data.append([planet, pos['sign'], pos['degree']])
 
-    st.pyplot(fig)
+    df = pd.DataFrame(data, columns=['Planet', 'Sign', 'Degree'])
+
+    st.write("Planetary Positions:")
+    st.dataframe(df)
 
 if __name__ == "__main__":
     main()
