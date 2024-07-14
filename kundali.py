@@ -27,34 +27,40 @@ def plot_kundali(positions):
     ax.set_ylim(0, 10)
     ax.axis('off')
 
-    # Draw the diamonds
-    diamonds = [
-        [(5, 9), (7, 7), (5, 5), (3, 7)],  # 1
-        [(7, 7), (9, 5), (7, 3), (5, 5)],  # 2
-        [(5, 5), (7, 3), (5, 1), (3, 3)],  # 3
-        [(3, 7), (5, 5), (3, 3), (1, 5)],  # 4
-        [(1, 5), (3, 3), (1, 1), (-1, 3)], # 5
-        [(3, 3), (5, 1), (3, -1), (1, 1)], # 6
-        [(5, 1), (7, -1), (5, -3), (3, -1)], # 7
-        [(7, -1), (9, -3), (7, -5), (5, -3)], # 8
-        [(5, -3), (7, -5), (5, -7), (3, -5)], # 9
-        [(3, -1), (5, -3), (3, -5), (1, -3)], # 10
-        [(1, 1), (3, -1), (1, -3), (-1, -1)], # 11
-        [(3, 7), (1, 5), (3, 3), (5, 5)]  # 12
+    # Coordinates for the diamonds
+    squares = [
+        [(5, 8), (6, 7), (5, 6), (4, 7)],  # 1
+        [(6, 7), (7, 6), (6, 5), (5, 6)],  # 2
+        [(7, 6), (8, 5), (7, 4), (6, 5)],  # 3
+        [(6, 5), (7, 4), (6, 3), (5, 4)],  # 4
+        [(5, 4), (6, 3), (5, 2), (4, 3)],  # 5
+        [(4, 3), (5, 2), (4, 1), (3, 2)],  # 6
+        [(3, 2), (4, 1), (3, 0), (2, 1)],  # 7
+        [(4, 7), (5, 6), (4, 5), (3, 6)],  # 8
+        [(3, 6), (4, 5), (3, 4), (2, 5)],  # 9
+        [(2, 5), (3, 4), (2, 3), (1, 4)],  # 10
+        [(1, 4), (2, 3), (1, 2), (0, 3)],  # 11
+        [(2, 1), (3, 0), (2, -1), (1, 0)], # 12
     ]
 
-    for i, diamond in enumerate(diamonds):
-        poly = plt.Polygon(diamond, fill=None, edgecolor='k')
-        ax.add_patch(poly)
-        cx = np.mean([point[0] for point in diamond])
-        cy = np.mean([point[1] for point in diamond])
+    # Drawing the diamonds
+    for square in squares:
+        square.append(square[0])  # Close the square
+        xs, ys = zip(*square)
+        ax.plot(xs, ys, 'k')
+
+    # Numbering the houses
+    for i, square in enumerate(squares):
+        cx = np.mean([point[0] for point in square])
+        cy = np.mean([point[1] for point in square])
         ax.text(cx, cy, f'{i+1}', fontsize=12, ha='center', va='center')
 
     # Plot planetary positions
     for planet, pos in positions.items():
         degree = pos['degree']
         sign = pos['sign']
-        cx, cy = np.mean([point[0] for point in diamonds[sign - 1]]), np.mean([point[1] for point in diamonds[sign - 1]])
+        cx = np.mean([point[0] for point in squares[sign - 1]])
+        cy = np.mean([point[1] for point in squares[sign - 1]])
         ax.text(cx, cy, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
 
     return fig
