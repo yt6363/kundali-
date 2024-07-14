@@ -2,7 +2,6 @@ import ephem
 import datetime
 import streamlit as st
 import matplotlib.pyplot as plt
-import numpy as np
 
 def calculate_planetary_positions(date_time, latitude, longitude):
     observer = ephem.Observer()
@@ -27,40 +26,41 @@ def plot_kundali(positions):
     ax.set_ylim(0, 10)
     ax.axis('off')
 
-    # Coordinates for the diamonds
+    # Coordinates for the diamond chart
     squares = [
-        [(5, 8), (6, 7), (5, 6), (4, 7)],  # 1
-        [(6, 7), (7, 6), (6, 5), (5, 6)],  # 2
-        [(7, 6), (8, 5), (7, 4), (6, 5)],  # 3
-        [(6, 5), (7, 4), (6, 3), (5, 4)],  # 4
-        [(5, 4), (6, 3), (5, 2), (4, 3)],  # 5
-        [(4, 3), (5, 2), (4, 1), (3, 2)],  # 6
-        [(3, 2), (4, 1), (3, 0), (2, 1)],  # 7
-        [(4, 7), (5, 6), (4, 5), (3, 6)],  # 8
-        [(3, 6), (4, 5), (3, 4), (2, 5)],  # 9
-        [(2, 5), (3, 4), (2, 3), (1, 4)],  # 10
-        [(1, 4), (2, 3), (1, 2), (0, 3)],  # 11
-        [(2, 1), (3, 0), (2, -1), (1, 0)], # 12
+        [(5, 9), (6, 8), (5, 7), (4, 8)],  # 1
+        [(6, 8), (7, 7), (6, 6), (5, 7)],  # 2
+        [(7, 7), (8, 6), (7, 5), (6, 6)],  # 3
+        [(6, 6), (7, 5), (6, 4), (5, 5)],  # 4
+        [(5, 5), (6, 4), (5, 3), (4, 4)],  # 5
+        [(4, 4), (5, 3), (4, 2), (3, 3)],  # 6
+        [(3, 3), (4, 2), (3, 1), (2, 2)],  # 7
+        [(4, 8), (5, 7), (4, 6), (3, 7)],  # 8
+        [(3, 7), (4, 6), (3, 5), (2, 6)],  # 9
+        [(2, 6), (3, 5), (2, 4), (1, 5)],  # 10
+        [(1, 5), (2, 4), (1, 3), (0, 4)],  # 11
+        [(2, 2), (3, 1), (2, 0), (1, 1)],  # 12
     ]
 
-    # Drawing the diamonds
+    # Draw the diamond chart
     for square in squares:
         square.append(square[0])  # Close the square
         xs, ys = zip(*square)
         ax.plot(xs, ys, 'k')
 
-    # Numbering the houses
-    for i, square in enumerate(squares):
-        cx = np.mean([point[0] for point in square])
-        cy = np.mean([point[1] for point in square])
+    # Number the houses
+    house_centers = [
+        (5, 8), (6, 7), (7, 6), (6, 5), (5, 4), (4, 3), (3, 2), (4, 6), (3, 5), (2, 4), (1, 3), (2, 2)
+    ]
+    
+    for i, (cx, cy) in enumerate(house_centers):
         ax.text(cx, cy, f'{i+1}', fontsize=12, ha='center', va='center')
 
     # Plot planetary positions
     for planet, pos in positions.items():
         degree = pos['degree']
         sign = pos['sign']
-        cx = np.mean([point[0] for point in squares[sign - 1]])
-        cy = np.mean([point[1] for point in squares[sign - 1]])
+        cx, cy = house_centers[sign - 1]
         ax.text(cx, cy, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
 
     return fig
