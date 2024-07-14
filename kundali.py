@@ -26,12 +26,27 @@ def plot_kundali(positions):
     ax.set_ylim(0, 8)
     ax.axis('off')
 
-    # Draw the diamond chart
+    # Coordinates for the diamond-shaped chart
     squares = [
-        (4, 6), (6, 4), (4, 2), (2, 4), (0, 4), (2, 6), (6, 6), (6, 2), (2, 2), (4, 4), (0, 6), (0, 2)
+        (4, 6), (6, 5), (7, 4), (6, 3), (4, 2), (2, 3), (1, 4), (2, 5),
+        (3, 5.5), (5, 5.5), (5, 2.5), (3, 2.5)
     ]
+
+    # Drawing lines for the diamond shape
+    lines = [
+        [(4, 6), (6, 5), (7, 4), (6, 3), (4, 2), (2, 3), (1, 4), (2, 5), (4, 6)],
+        [(4, 6), (4, 2)],
+        [(6, 5), (2, 3)],
+        [(7, 4), (1, 4)],
+        [(6, 3), (2, 5)],
+    ]
+
+    for line in lines:
+        xs, ys = zip(*line)
+        ax.plot(xs, ys, 'k')
+
+    # Numbering the houses
     for i, (x, y) in enumerate(squares):
-        ax.plot([4, x], [4, y], 'k')
         ax.text(x, y, f'{i+1}', fontsize=12, ha='center', va='center')
 
     # Plot planetary positions
