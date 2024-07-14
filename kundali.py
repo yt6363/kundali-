@@ -1,18 +1,24 @@
-import pyswisseph as swe
+import ephem
 import datetime
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 
 def calculate_planetary_positions(date_time, latitude, longitude):
-    jd = swe.julday(date_time.year, date_time.month, date_time.day, 
-                    date_time.hour + date_time.minute / 60.0)
-    planets = [swe.SUN, swe.MOON, swe.MARS, swe.MERCURY, swe.JUPITER, swe.VENUS, swe.SATURN]
+    observer = ephem.Observer()
+    observer.date = date_time
+    observer.lat = str(latitude)
+    observer.lon = str(longitude)
+    
+    planets = [ephem.Sun(), ephem.Moon(), ephem.Mars(), ephem.Mercury(), ephem.Jupiter(), ephem.Venus(), ephem.Saturn()]
     positions = {}
+    
     for planet in planets:
-        lon, lat, dist = swe.calc_ut(jd, planet, swe.FLG_SIDEREAL)[:3]
+        planet.compute(observer)
+        lon = np.degrees(planet.ra) % 360
         sign = int(lon // 30) + 1
-        positions[swe.get_planet_name(planet)] = {'degree': lon % 30, 'sign': sign}
+        positions[planet.name] = {'degree': lon % 30, 'sign': sign}
+    
     return positions
 
 def plot_kundali(positions):
@@ -36,6 +42,23 @@ def plot_kundali(positions):
         ax.text(x + 2, y + 2, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
 
     return fig
+
+def get_lat_long(country):
+    coordinates = {
+        'USA': {
+            'New York': (40.7128, -74.0060),
+            'Los Angeles': (34.0522, -118.2437),
+            'Chicago': (41.8781, -87.6298),
+            'Houston': (29.7604, -95.3698)
+        },
+        'India': {
+            'Delhi': (28.7041, 77.1025),
+            'Mumbai': (19.0760, 72.8777),
+            'Bangalore': (12.9716, 77.5946),
+            'Chennai': (13.0827, 80.2707)
+        }
+    }
+    return coordinates[country]
 
 def main():
     st.title("Kundali (Vedic Astrology Birth Chart) Generator")
