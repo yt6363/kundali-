@@ -2,7 +2,6 @@ import ephem
 import datetime
 import streamlit as st
 import matplotlib.pyplot as plt
-import numpy as np
 
 def calculate_planetary_positions(date_time, latitude, longitude):
     observer = ephem.Observer()
@@ -15,7 +14,7 @@ def calculate_planetary_positions(date_time, latitude, longitude):
     
     for planet in planets:
         planet.compute(observer)
-        lon = np.degrees(planet.ra) % 360
+        lon = (planet.ra / ephem.degree) % 360
         sign = int(lon // 30) + 1
         positions[planet.name] = {'degree': lon % 30, 'sign': sign}
     
@@ -27,19 +26,33 @@ def plot_kundali(positions):
     ax.set_ylim(0, 8)
     ax.axis('off')
 
-    diamond_coords = np.array([[4, 8], [0, 4], [4, 0], [8, 4], [4, 8]])
-    for i in range(12):
-        rot_coords = np.dot(diamond_coords - 4, np.array([[np.cos(np.pi/6 * i), -np.sin(np.pi/6 * i)], 
-                                                          [np.sin(np.pi/6 * i), np.cos(np.pi/6 * i)]])) + 4
-        ax.plot(rot_coords[:, 0], rot_coords[:, 1], 'k')
-        ax.text(rot_coords[1, 0] + 0.2, rot_coords[1, 1], f'{i+1}', fontsize=12, ha='center', va='center')
-    
+    # Draw the diamond chart
+    squares = [
+        (2, 6, 4, 4),
+        (4, 8, 4, 4),
+        (2, 4, 4, 4),
+        (0, 4, 4, 4),
+        (2, 2, 4, 4),
+        (4, 0, 4, 4),
+        (6, 2, 4, 4),
+        (6, 4, 4, 4),
+        (4, 6, 4, 4),
+        (4, 4, 2, 2)
+    ]
+
+    for i, (x, y, width, height) in enumerate(squares):
+        ax.plot([x, x+width], [y, y], 'k')
+        ax.plot([x, x], [y, y+height], 'k')
+        ax.plot([x, x+width], [y+height, y+height], 'k')
+        ax.plot([x+width, x+width], [y, y+height], 'k')
+        ax.text(x+width/2, y+height/2, f'{i+1}', fontsize=12, ha='center', va='center')
+
+    # Plot planetary positions
     for planet, pos in positions.items():
         degree = pos['degree']
         sign = pos['sign']
-        x = (sign - 1) % 3 * 4
-        y = (sign - 1) // 3 * 4
-        ax.text(x + 2, y + 2, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
+        x, y, width, height = squares[sign-1]
+        ax.text(x + width / 2, y + height / 2, f'{planet}\n{degree:.2f}°', fontsize=10, ha='center', va='center')
 
     return fig
 
